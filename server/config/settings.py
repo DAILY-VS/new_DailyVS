@@ -78,7 +78,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django.contrib.auth.middleware.AuthenticationMiddleware', #
     'django.contrib.auth.middleware.RemoteUserMiddleware', #
-    'allauth.account.middleware.AccountMiddleware'
 ]
 
 # CORS 추가
