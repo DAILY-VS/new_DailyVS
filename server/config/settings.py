@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "vs_account",
     "vote",
+    'accounts',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -84,6 +85,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:8000', 'http://localhost:3000')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = "config.urls"
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -147,8 +149,6 @@ USE_I18N = True
 
 USE_TZ = False
 
-AUTH_USER_MODEL = "vs_account.User"
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -161,7 +161,29 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 FAVICON_PATH = os.path.join(BASE_DIR, "static", "favicon.ico")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'SET_PASSWORD_RETYPE': True, 
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS':{
+        'user_create': 'accounts.serializers.UserCreateSerializer',
+        'user': 'accounts.serializers.UserCreateSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },
+}
 
+REST_FRAMEWORK = {
+     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+      ],
+}
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',    
@@ -183,7 +205,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = '/'   # social login redirect
 ACCOUNT_LOGOUT_REDIRECT_URL = 'https://daily-vs.com/accounts/kakao/login/callback/'
-AUTH_USER_MODEL = "vs_account.User"  ##
+AUTH_USER_MODEL = "accounts.UserAccount"  ##
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
