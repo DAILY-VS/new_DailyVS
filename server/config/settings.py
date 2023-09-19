@@ -58,11 +58,13 @@ INSTALLED_APPS = [
     "vs_account",
     "vote",
     'accounts',
+
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    'rest_auth.registration',
 
     "rest_framework", #추가 코드
     "djoser",
@@ -226,6 +228,9 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',    
 ]
 
+SOCIAL_AUTH_KAKAO_CLIENT_ID=env('SOCIAL_AUTH_KAKAO_CLIENT_ID')
+SOCIAL_AUTH_KAKAO_SECRET=env('SOCIAL_AUTH_KAKAO_SECRET')
+
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'kakao': {
@@ -233,8 +238,8 @@ SOCIALACCOUNT_PROVIDERS = {
         # (``socialaccount`` app) containing the required client
         # credentials, or list them here:
         'APP': {
-            'client_id': '6e0b76c3ceeb04bed80541df1eb81445',
-            'secret': '7GHqOVkfQnvOf81TcIxtk91JW2VceNnJ',
+            'client_id': SOCIAL_AUTH_KAKAO_CLIENT_ID,
+            'secret': SOCIAL_AUTH_KAKAO_SECRET,
             'key': ''
         }
     }
