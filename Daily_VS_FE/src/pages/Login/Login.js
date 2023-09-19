@@ -1,60 +1,60 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { login } from '../../actions/auth';
+import axios from 'axios';
 import LoginNav from '../../components/LoginNav/LoginNav';
 
-const Login = () => {
-  const [logInError, setLogInError] = useState(false);
-  const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
+const Login = ({ login, isAuthenticated }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  const { email, password } = formData;
 
   const navigate = useNavigate();
+  const onChange = e =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = e => {
     e.preventDefault();
-    fetch(`http://localhost:3095/api/users/login`, {
-      method: 'POST',
-      headers: { 'content-Type': 'application/json;charset=utf-8' },
-      body: JSON.stringify({
-        userId: userId,
-        password: password,
-      }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data) {
-          localStorage.setItem('token', data.access_token);
-          alert('환영합니다!');
-          navigate('/');
-        }
-      })
-      .catch(error => {
-        setLogInError(error.response?.data?.statusCode === 401);
-        alert(logInError + ': 아이디와 비밀번호를 다시 한번 확인해주세요');
-      });
+
+    login(email, password);
   };
 
-  const isValid = userId.length >= 5 && password.length >= 8;
+  if (isAuthenticated) {
+    navigate('/');
+    return null;
+  }
+
+  const isValid =
+    email.length >= 8 &&
+    email.includes('@') &&
+    email.includes('.') &&
+    password.length >= 8;
 
   return (
     <>
       <LoginNav />
-      <LoginPage onSubmit={onSubmit}>
+      <LoginPage onSubmit={e => onSubmit(e)}>
         <LoginLogo src="images/Nav/main_logo.png" />
         <LoginIdInput
           type="text"
-          name="userId"
-          value={userId}
-          onChange={e => setUserId(e.target.value)}
-          placeholder="아이디"
+          name="email"
+          value={email}
+          onChange={e => onChange(e)}
+          required
+          placeholder="이메일"
         />
         <LoginPwInput
           type="password"
           name="password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={e => onChange(e)}
           placeholder="비밀번호"
+          autoComplete="current-password"
         />
         <LoginSubmitBtn disabled={isValid ? false : true}>
           로그인
@@ -69,7 +69,11 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { login })(Login);
 
 const LoginPage = styled.form`
   display: flex;
@@ -89,7 +93,7 @@ const LoginIdInput = styled.input`
   width: 300px;
   height: 50px;
   margin-bottom: 10px;
-  font-size: 20px;
+  font-size: 18px;
   border: 1px rgba(128, 128, 128, 0.2) solid;
   background-color: #f4faff;
   padding-left: 20px;
@@ -99,7 +103,7 @@ const LoginPwInput = styled.input`
   width: 300px;
   height: 50px;
   margin-bottom: 30px;
-  font-size: 20px;
+  font-size: 18px;
   border: 1px rgba(128, 128, 128, 0.2) solid;
   background-color: #f4faff;
   padding-left: 20px;
