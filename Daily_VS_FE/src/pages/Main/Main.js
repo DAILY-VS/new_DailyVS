@@ -17,19 +17,19 @@ const Main = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/`)
+    fetch(`http://127.0.0.1:8000/api/`)
       .then(response => response.json())
       .then(result => {
         setApiList(result);
         console.log(result);
       });
   }, []);
-
   return (
     <Container>
       <MainPage>
         <MainCarousel loading={loading} />
-        <MainGrid loading={loading} apiList={apiList} />
+        <MainGrid loading={loading} />
+        {/* <MainApi>{apiList}</MainApi> */}
       </MainPage>
     </Container>
   );
@@ -47,12 +47,12 @@ const MainPage = styled.h1`
   color: black;
 `;
 
-// const MainApi = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   width: 500px;
-//   margin: 30px auto 30px auto;
-// `;
+const MainApi = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  margin: 30px auto 30px auto;
+`;
 
 export default Main;
