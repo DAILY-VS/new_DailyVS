@@ -395,6 +395,7 @@ def calculate_nested_count(request, comment_id):
 
 
 # 투표 시 회원, 비회원 구분 (비회원일시 성별 기입)
+@api_view(['GET'])
 def classifyuser(request, poll_id):
     user= request.user
     if user.is_authenticated and user.custom_active==False:
@@ -497,18 +498,20 @@ def classifyuser(request, poll_id):
                 vote.save()
                 nonuservote_id = vote.id
                 poll = get_object_or_404(Poll, pk=poll_id)
+                serialized_poll = PollSerializer(poll).data
                 context = {
-                    "poll": poll,
+                    "poll": serialized_poll,
                     "gender": ["M", "W"],
                     "nonuservote_id": nonuservote_id,
-                    "loop_time": range(0, 2),
+                    "loop_time": [0,1],
                 }
-                return render(request, "vote/detail2.html", context)
+                return Response(context)
     else:
         return redirect("/")
 
 
 # 회원/비회원 투표 통계 계산 및 결과 페이지
+@api_view(['GET'])
 def calcstat(request, poll_id, uservote_id, nonuservote_id):
     user= request.user
     if user.is_authenticated and user.custom_active==False:
@@ -898,7 +901,9 @@ def calcstat(request, poll_id, uservote_id, nonuservote_id):
     else : 
         key = maximum_key
     #key="남성"
-
+    serialized_poll = PollSerializer(poll).data
+    serialized_comments= CommentSerializer(comments, many=True).data
+    serialized_choices=ChoiceSerializer(choices, many=True).data
     ctx = {
         "total_count": total_count,
         # "choice1_count": total_choice1_count,
@@ -934,8 +939,8 @@ def calcstat(request, poll_id, uservote_id, nonuservote_id):
         "p_choice2_percentage": p_choice2_percentage,
         "j_choice1_percentage": j_choice1_percentage,
         "j_choice2_percentage": j_choice2_percentage,
-        "poll": poll,
-        "comments": comments,
+        "poll": serialized_poll,
+        "comments": serialized_comments,
         "comments_count":comments.count(),
         "uservotes": uservotes,
         "minimum_key": minimum_key,
@@ -944,16 +949,17 @@ def calcstat(request, poll_id, uservote_id, nonuservote_id):
         "maximum_value": maximum_value,
         "sort": sort,
         "key": key,
-        "choices": choices,
+        "choices": serialized_choices,
         "choice_filter":choice_filter,
         "new_comment_count": poll.comments,
     }
+    #poll, comments, uservotes, choices, poll.comments,
     ##################################################################################
-
-    return render(request, template_name="vote/result.html", context=ctx)
+    return Response(ctx)
 
 
 # 비회원 투표시 MBTI 기입
+@api_view(['GET'])
 def poll_nonusermbti(request, poll_id, nonuservote_id):
     if request.method == "POST":
         choice_id = request.POST.get("choice")
@@ -969,14 +975,15 @@ def poll_nonusermbti(request, poll_id, nonuservote_id):
         if choice_id == "W":
             NonUserVote.objects.filter(pk=nonuservote_id).update(gender="W")
 
-        poll = get_object_or_404(Poll, id=poll_id)
+        poll = get_object_or_404(Poll, pk=poll_id)
+        serialized_poll = PollSerializer(poll).data
         context = {
-            "poll": poll,
-            "mbti": [],  # 여기에 MBTI 리스트 추가
+            "poll": serialized_poll,
+            "gender": ["M", "W"],
             "nonuservote_id": nonuservote_id,
-            "loop_time": range(0, 2),
+            "loop_time": [0,1],
         }
-        return render(request, "vote/detail3.html", context)
+        return Response(context)
     else:
         return redirect("/")
 
@@ -1072,7 +1079,8 @@ def get_random_fortune(mbti):
 
     selected_fortunes = fortunes.get(mbti, [])
     return random.choice(selected_fortunes) if selected_fortunes else default_fortune
-    
+
+@api_view(['GET'])    
 def fortune(request):
     user = request.user
     if user.is_authenticated:
@@ -1080,7 +1088,7 @@ def fortune(request):
     else:
         random_fortune = get_random_fortune('nonuser')
 
-    return render(request, "vote/main/main-fortune.html", {"random_fortune": random_fortune})
+    return Response({"random_fortune": random_fortune})
 
 
 # class PollList(APIView):
