@@ -1,178 +1,182 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoginNav from '../../components/LoginNav/LoginNav';
+import { connect } from 'react-redux';
+import { signup } from '../../actions/auth';
+import axios from 'axios';
 
-const Signup = () => {
-  const [userSignupEmail, setUserSignupEmail] = useState('');
-  const [userSignupPW, setUserSignupPW] = useState('');
-  const [signupPWCheck, setSignupPWCheck] = useState('');
-  const [selectedGender, setSelectedGender] = useState('');
-  const [userSignupInfo, setUserSignupInfo] = useState({
-    signupEmail: '',
-    signupID: '',
-    signupPW: '',
-    signupMBTI: '',
-    signupNickName: '',
-    signupGender: selectedGender,
+const Signup = ({ signup, isAuthenticated }) => {
+  const [accountCreated, setAccountCreated] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    nickname: '',
+    gender: '',
+    mbti: '',
+    password: '',
+    re_password: '',
   });
+  const { email, nickname, gender, mbti, password, re_password } = formData;
 
-  const {
-    signupEmail,
-    signupID,
-    signupPW,
-    signupMBTI,
-    signupNickName,
-    signupGender,
-  } = userSignupInfo;
+  const [passwordMatch, setPasswordMatch] = useState(false);
 
-  const emailRegEx =
-    /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
-  const passwordRegEx = /^[A-Za-z0-9]{8,15}$/;
+  const navigate = useNavigate();
+  const [selectedGender, setSelectedGender] = useState('');
 
-  const emailCheck = userSignupEmail => {
-    return emailRegEx.test(userSignupEmail); //형식에 맞을 경우, true 리턴
+  const handleGenderChange = e => {
+    setSelectedGender(e.target.value);
+    setFormData({
+      ...formData,
+      gender: e.target.value,
+    });
   };
 
-  const passwordCheck = userSignupPW => {
-    if (userSignupPW.match(passwordRegEx) === null) {
-      //형식에 맞지 않을 경우 아래 콘솔 출력
-      console.log('비밀번호 형식을 확인해주세요');
-      return;
-    } else {
-      // 맞을 경우 출력
-      console.log('비밀번호 형식이 맞아요');
-    }
-  };
-
-  const passwordDoubleCheck = (userSignupPW, signupPWCheck) => {
-    if (userSignupPW !== signupPWCheck) {
-      console.log('비밀번호가 다릅니다.');
-      return;
-    } else {
-      console.log('비밀번호가 동일합니다');
-    }
+  const isFormValid = () => {
+    return (
+      email.length > 0 &&
+      mbti.length > 0 &&
+      password.length > 0 &&
+      nickname.length >= 2 &&
+      gender.length > 0
+    );
   };
 
   const onSubmit = e => {
     e.preventDefault();
-    console.log(userSignupInfo);
+    console.log(formData);
+
+    if (password === re_password) {
+      signup(email, nickname, gender, mbti, password, re_password);
+      setAccountCreated(true);
+    }
   };
 
-  // const isSignupValid =
-  //   userSignupInfo.signupEmail.length >= 10 &&
-  //   5 <= userSignupInfo.signupID.length <= 10 &&
-  //   8 <= userSignupInfo.signupPW.length <= 15 &&
-  //   userSignupInfo.signupMBTI.length === 4 &&
-  //   2 <= userSignupInfo.signupNickName <= 10 &&
-  //   userSignupInfo.signupGender.length === 2;
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (accountCreated) {
+      navigate('/login');
+    }
+  }, [accountCreated, navigate]);
+
+  const mbtiOptions = [
+    'ISTJ',
+    'ISFJ',
+    'INFJ',
+    'INTJ',
+    'ISTP',
+    'ISFP',
+    'INFP',
+    'INTP',
+    'ESTP',
+    'ESFP',
+    'ENFP',
+    'ENTP',
+    'ESTJ',
+    'ESFJ',
+    'ENFJ',
+    'ENTJ',
+  ];
+
   return (
     <>
       <LoginNav />
       <SignupPage>
         <SignupContainer onSubmit={onSubmit}>
           <SignupLogo src="images/LoginNav/Only_Tex.png" />
-          <SignupEmailInput
-            value={signupEmail}
+          <SignupLabel>이메일</SignupLabel>
+          <TextInput
+            value={email}
             type="email"
             placeholder="이메일 주소"
-            onChange={e => {
-              setUserSignupInfo({
-                ...userSignupInfo,
-                signupEmail: e.target.value,
-              });
-              setUserSignupEmail(e.target.value);
-              emailCheck(e.target.value);
-            }}
+            onChange={e => setFormData({ ...formData, email: e.target.value })}
+            required
+            autoComplete="new-password"
           />
-          <SignupIdInput
-            value={signupID}
-            placeholder="아이디 (5자 이상 10자 이하)"
-            onChange={e => {
-              setUserSignupInfo({
-                ...userSignupInfo,
-                signupID: e.target.value,
-              });
-            }}
-          />
-          <SignupPwInput
-            value={signupPW}
+          <SignupLabel>비밀번호(8자 이상 15자 이하) </SignupLabel>
+          <TextInput
+            value={password}
             type="password"
-            placeholder="비밀번호 (8자 이상 15자 이하)"
-            onChange={e => {
-              setUserSignupPW(e.target.value);
-              passwordCheck(e.target.value);
-              setUserSignupInfo({
-                ...userSignupInfo,
-                signupPW: e.target.value,
-              });
-            }}
+            placeholder="비밀번호"
+            onChange={e =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            required
           />
-          <SignupPwCheckInput
-            value={signupPWCheck}
+          <SignupLabel>
+            확인 비밀번호
+            {passwordMatch && (
+              <PasswordMatchText>
+                비밀번호 일치 <PassWordCheck src="images/LoginNav/check.png" />
+              </PasswordMatchText>
+            )}
+          </SignupLabel>
+          <TextInput
             type="password"
             placeholder="확인 비밀번호"
-            onChange={e => {
-              setSignupPWCheck(e.target.value);
-              passwordDoubleCheck(userSignupPW, e.target.value);
-            }}
+            name="re_password"
+            value={re_password}
+            onChange={e =>
+              setFormData({ ...formData, re_password: e.target.value })
+            }
           />
-          <SignupMBTIInput
-            value={signupMBTI}
-            placeholder="MBTI"
-            onChange={e => {
-              setUserSignupInfo({
-                ...userSignupInfo,
-                signupMBTI: e.target.value,
-              });
-            }}
-          />
-          <SignupNickNameInput
-            value={signupNickName}
+          <SignupLabel>기타 정보 (성향 분석에 필요합니다!)</SignupLabel>
+          <MBTIDropdown
+            value={mbti}
+            onChange={e => setFormData({ ...formData, mbti: e.target.value })}
+          >
+            <option value="">MBTI 선택</option>
+            {mbtiOptions.map(option => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </MBTIDropdown>
+          <TextInput
+            value={nickname}
             placeholder="닉네임 (2자 이상 10자 이하)"
-            onChange={e => {
-              setUserSignupInfo({
-                ...userSignupInfo,
-                signupNickName: e.target.value,
-              });
-            }}
+            onChange={e =>
+              setFormData({ ...formData, nickname: e.target.value })
+            }
           />
-          <GenderLabel>성별</GenderLabel>
           <GenderRadioGroup>
-            <GenderRadio
+            <input
+              className="radio-input"
               type="radio"
-              id="male"
               name="gender"
-              value="male"
-              checked={selectedGender === 'male'}
-              onChange={() => {
-                setSelectedGender('male');
-                setUserSignupInfo({
-                  ...userSignupInfo,
-                  signupGender: 'male',
-                });
-              }}
+              value="M"
+              checked={gender === 'M'}
+              onChange={e => handleGenderChange(e)}
+              id="male-radio"
             />
-            <GenderLabel htmlFor="male">남성</GenderLabel>
-            <GenderRadio
-              type="radio"
-              id="female"
-              name="gender"
-              value="female"
-              checked={selectedGender === 'female'}
-              onChange={() => {
-                setSelectedGender('female');
-                setUserSignupInfo({
-                  ...userSignupInfo,
-                  signupGender: 'female',
-                });
-              }}
-            />
-            <GenderLabel htmlFor="female">여성</GenderLabel>
-          </GenderRadioGroup>
+            <GenderOption
+              htmlFor="male-radio"
+              className={gender === 'M' ? 'selected' : ''}
+            >
+              남성
+            </GenderOption>
 
-          {/* <SignupBtn disabled={isSignupValid ? false : true}> */}
-          <SignupBtn>회원가입</SignupBtn>
+            <input
+              className="radio-input"
+              type="radio"
+              name="gender"
+              value="W"
+              checked={gender === 'W'}
+              onChange={e => handleGenderChange(e)}
+              id="female-radio"
+            />
+            <GenderOption
+              htmlFor="female-radio"
+              className={gender === 'W' ? 'selected' : ''}
+            >
+              여성
+            </GenderOption>
+          </GenderRadioGroup>
+          <SignupBtn disabled={!isFormValid()}>회원가입</SignupBtn>
           <SignupToLogin>
             바로 <SignupLoginBtn to="/login">로그인</SignupLoginBtn>하러 가기
           </SignupToLogin>
@@ -182,7 +186,11 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { signup })(Signup);
 
 const SignupPage = styled.div`
   display: flex;
@@ -201,7 +209,29 @@ const SignupLogo = styled.img`
   width: 280px;
 `;
 
-const SignupEmailInput = styled.input`
+const PassWordCheck = styled.img`
+  opacity: 0.9;
+  width: 20px;
+  margin-left: 5px;
+`;
+
+const PasswordMatchText = styled.span`
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  color: green;
+  transition: opacity 0.3s ease;
+`;
+
+const SignupLabel = styled.label`
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  height: 20px;
+`;
+
+const TextInput = styled.input`
   width: 300px;
   height: 50px;
   margin-bottom: 10px;
@@ -209,69 +239,36 @@ const SignupEmailInput = styled.input`
   border: 1px rgba(128, 128, 128, 0.2) solid;
   background-color: #f4faff;
   padding-left: 20px;
-`;
-
-const SignupIdInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  border: 1px rgba(128, 128, 128, 0.2) solid;
-  background-color: #f4faff;
-  padding-left: 20px;
-`;
-
-const SignupPwInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  border: 1px rgba(128, 128, 128, 0.2) solid;
-  background-color: #f4faff;
-  padding-left: 20px;
-`;
-
-const SignupPwCheckInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  border: 1px rgba(128, 128, 128, 0.2) solid;
-  background-color: #f4faff;
-  padding-left: 20px;
-`;
-
-const SignupMBTIInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  border: 1px rgba(128, 128, 128, 0.2) solid;
-  background-color: #f4faff;
-  padding-left: 20px;
-`;
-
-const SignupNickNameInput = styled.input`
-  width: 300px;
-  height: 50px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  border: 1px rgba(128, 128, 128, 0.2) solid;
-  background-color: #f4faff;
-  padding-left: 20px;
-`;
-
-const GenderLabel = styled.label`
-  margin-top: 10px;
-  font-size: 18px;
 `;
 
 const GenderRadioGroup = styled.div`
-  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
 `;
 
-const GenderRadio = styled.input`
-  margin-right: 5px;
+const GenderOption = styled.label`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px rgba(128, 128, 128, 0.2) solid;
+  background-color: #f4faff;
+  height: 50px;
+  width: 140px;
+  cursor: pointer;
+  transition: border 0.3s ease;
+
+  .radio-input {
+    display: none;
+  }
+
+  &:hover {
+    border: 5px #17355a solid;
+  }
+
+  .radio-input:checked + & {
+    border: 5px #17355a solid;
+  }
 `;
 
 const SignupBtn = styled.button`
@@ -294,10 +291,16 @@ const SignupToLogin = styled.div`
 `;
 
 const SignupLoginBtn = styled(Link)`
-  margin: auto 3px;
   color: #ff495a;
-  &:hover {
-    border-bottom: 1px solid #ff495a;
-    cursor: pointer;
-  }
+  margin: 0px 5px;
+`;
+
+const MBTIDropdown = styled.select`
+  width: 300px;
+  height: 50px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  border: 1px rgba(128, 128, 128, 0.2) solid;
+  background-color: #f4faff;
+  padding-left: 20px;
 `;

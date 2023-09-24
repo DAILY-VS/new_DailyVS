@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
 
     "rest_framework", #추가 코드
-    'djoser',
     "corsheaders", # cors 추가 코드
 ]
 
@@ -87,6 +86,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:8000', 'http://localhost:3000')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = "config.urls"
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -150,7 +150,7 @@ USE_I18N = True
 
 USE_TZ = False
 
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "vs_account.User"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
