@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import EIGraph from './EIGraph/EIGraph.js';
 import PJGraph from './PJGraph/PJGraph.js';
@@ -9,6 +9,7 @@ import GenderGraph from './GenderGraph/GenderGraph.js';
 const ResultGraph = ({ voteResult }) => {
   return (
     <GraphContainer>
+      <GraphCategory>카테고리</GraphCategory>
       <GenderGraph
         option1={voteResult.option_1}
         option2={voteResult.option_2}
@@ -60,4 +61,11 @@ const GraphContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   margin-left: 30px;
+`;
+
+const GraphCategory = styled.h1`
+  margin-top: 30px;
+  font-size: 24px;
+  font-family: 'GongGothicLight';
+  color: ${props => props.theme.colors.turquoisSecondaryColor};
 `;
