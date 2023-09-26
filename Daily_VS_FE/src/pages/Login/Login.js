@@ -1,36 +1,59 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { login } from '../../actions/auth';
+import axios from 'axios';
 import LoginNav from '../../components/LoginNav/LoginNav';
 
-const Login = () => {
-  const [userInfo, setuserInfo] = useState({ userID: '', userPW: '' });
-  const { userID, userPW } = userInfo;
-  const onChangeHandler = e => {
-    const { name, value } = e.target;
-    setuserInfo({ ...userInfo, [name]: value });
+const Login = ({ login, isAuthenticated }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  const { email, password } = formData;
+
+  const navigate = useNavigate();
+  const onChange = e =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const onSubmit = e => {
+    e.preventDefault();
+    login(email, password);
   };
 
-  const isValid = userInfo.userID.length >= 5 && userInfo.userPW.length >= 8;
+  if (isAuthenticated) {
+    navigate('/');
+    return null;
+  }
+
+  const isValid =
+    email.length >= 8 &&
+    email.includes('@') &&
+    email.includes('.') &&
+    password.length >= 8;
 
   return (
     <>
       <LoginNav />
-      <LoginPage>
+      <LoginPage onSubmit={e => onSubmit(e)}>
         <LoginLogo src="images/Nav/main_logo.png" />
         <LoginIdInput
           type="text"
-          name="userID"
-          value={userID}
-          onChange={onChangeHandler}
-          placeholder="아이디"
+          name="email"
+          value={email}
+          onChange={e => onChange(e)}
+          required
+          placeholder="이메일"
         />
         <LoginPwInput
-          type="text"
-          name="userPW"
-          value={userPW}
-          onChange={onChangeHandler}
+          type="password"
+          name="password"
+          value={password}
+          onChange={e => onChange(e)}
           placeholder="비밀번호"
+          autoComplete="current-password"
         />
         <LoginSubmitBtn disabled={isValid ? false : true}>
           로그인
@@ -38,7 +61,6 @@ const Login = () => {
         <LoginAsk>
           아직 로그인 계정이 없으신가요?
           <LoginToSignup to="/signup">회원가입</LoginToSignup>
-          <SignupPwLine>|</SignupPwLine>
           <LoginFindPw>비밀번호 찾기</LoginFindPw>
         </LoginAsk>
       </LoginPage>
@@ -46,9 +68,13 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
 
-const LoginPage = styled.div`
+export default connect(mapStateToProps, { login })(Login);
+
+const LoginPage = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,7 +92,7 @@ const LoginIdInput = styled.input`
   width: 300px;
   height: 50px;
   margin-bottom: 10px;
-  font-size: 20px;
+  font-size: 18px;
   border: 1px rgba(128, 128, 128, 0.2) solid;
   background-color: #f4faff;
   padding-left: 20px;
@@ -76,7 +102,7 @@ const LoginPwInput = styled.input`
   width: 300px;
   height: 50px;
   margin-bottom: 30px;
-  font-size: 20px;
+  font-size: 18px;
   border: 1px rgba(128, 128, 128, 0.2) solid;
   background-color: #f4faff;
   padding-left: 20px;
@@ -111,11 +137,8 @@ const LoginToSignup = styled(Link)`
   }
 `;
 
-const SignupPwLine = styled.span`
-  margin: auto 3px;
-`;
-
 const LoginFindPw = styled(Link)`
+  margin-left: 6px;
   color: #457c9e;
   font-weight: bold;
   &:hover {
