@@ -6,13 +6,13 @@
 #  Developers 
 
 ## Back-End Developers 
-| 김정곤 (BE/PM)| 왕한솔 (BE/배포)| 송우진 (BE/마케팅)|
+| 김정곤 (BE/PM)| 왕한솔 (BE/배포)| 박신빈 (BE/기능개발)|
 | :--: | :--: | :--: |
 | [<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>](https://github.com/Jeonggon-Kim) | [<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>](https://github.com/hasoleee) | [<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>](https://github.com/song-jin-jin) |
 
 
 ## Front-End Developsers
-| 곽민경 (FE/디자인)| 조성민 (FE/기획) |
+| 곽민경 (FE/디자인)| 정환희 (FE/UI,UX) |
 | :--: | :--: |
 | [<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>](https://github.com/mikio999) | [<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>](https://github.com/noviceo) |
 
