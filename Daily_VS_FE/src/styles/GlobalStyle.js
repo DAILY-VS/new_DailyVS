@@ -1,6 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
-// import NEXONFont from './fonts/NEXON-Gothic-Regular.otf';
-import esamanruMedium from './fonts/esamanru-Light.otf';
+import esamanruMedium from './fonts/esamanru-Medium.otf';
 import esamanruBold from './fonts/esamanru-Bold.otf';
 import esamanruLight from './fonts/esamanru-Light.otf';
 
@@ -14,13 +13,6 @@ const GlobalStyle = createGlobalStyle`
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF.woff')
       format('woff');
   }
-
-  /* @font-face {
-    font-family: 'GongGothicMedium';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff')
-      format('woff');
-  }
-   */
 
     @font-face {
     font-family: 'GongGothicMedium';

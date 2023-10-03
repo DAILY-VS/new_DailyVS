@@ -100,11 +100,12 @@ const GenderOptionName = styled.div`
   font-size: 26px;
   height: 70px;
   width: 280px;
+  background-color: white;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  transition: border 0.3s ease;
+  transition: background-color 0.3s ease;
   &:hover {
-    border: 35px #ff495a solid;
+    background-color: #bdbdbd;
   }
 `;
 
