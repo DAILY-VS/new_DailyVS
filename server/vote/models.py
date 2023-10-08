@@ -5,7 +5,7 @@ from accounts.models import User
 
 #투표 게시글 DB
 class Poll(models.Model): 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE,)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, )
     title = models.TextField()
     content = models.TextField()
     pub_date = models.DateTimeField(default=timezone.now)
